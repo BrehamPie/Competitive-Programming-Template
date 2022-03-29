@@ -1,8 +1,7 @@
 #include<bits/stdc++.h>
-#define eb emplace_back
-#define ll long long
 using namespace std;
-//Complexity - O(VE^2)
+using ll = long long;
+#define eb emplace_back
 struct Dinic {
     struct Edge {
         int u, v;
@@ -69,11 +68,48 @@ struct Dinic {
     }
 };
 int main() {
-    /*
-        Call Dinic with total number of nodes.
-        Nodes start from 0.
-        Capacity is long long data.
-        make graph with create edge(u,v,capacity).
-        Get max flow with maxFlow(src,des).
-    */
+    int tsh[6];
+    string val[7] = { "","S","M","L","XL","XXL","XXXL" };
+    map<string, int>mp = { {"S",1},{"M",2},{"L",3},{"XL",4},{"XXL",5},{"XXXL",6} };
+    for (int i = 0;i < 6;i++)cin >> tsh[i];
+    int n;cin >> n;
+    Dinic dic(n + 8);
+    for (int i = 7;i <= n + 6;i++) {
+        string str;
+        cin >> str;
+        string ch1, ch2;
+        bool f = 0;
+        for (int j = 0;j < str.size();j++) {
+            if (str[j] == ',') { f = 1;continue; }
+            if (!f) ch1 += str[j];
+            else ch2 += str[j];
+        }
+        dic.addEdge(i, mp[ch1], 1);
+        if (f) dic.addEdge(i, mp[ch2], 1);
+    }
+    for (int i = 1;i <= n;i++) dic.addEdge(0, i + 6, 1);
+    for (int i = 1;i <= 6;i++) { dic.addEdge(i, n + 7, tsh[i - 1]); }
+
+    int matched = dic.maxFlow(0, n + 7);
+    if (matched == n) {
+        puts("YES");
+        vector<int>ans(n + 1);
+        int k = dic.edge.size();
+        for (int i = 0;i < k;i += 2) {
+            int u = dic.edge[i].u;
+            int v = dic.edge[i].v;
+            int f = dic.edge[i].flow;
+            if (f) {
+                u -= 6;
+                if (u > 0 && u <= n && v > 0 && v < 7) {
+                    ans[u] = v;
+                }
+            }
+        }
+        for (int i = 1;i <= n;i++)cout << val[ans[i]] << endl;
+    }
+    else {
+        puts("NO");
+    }
+
 }
